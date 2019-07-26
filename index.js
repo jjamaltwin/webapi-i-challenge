@@ -51,7 +51,8 @@ server.get('/users', (req, res) => {
 });
 
 server.get('/users/:id', (req, res) => {
-    users.findById(req.params.id)
+    const {id} = req.params
+    users.findById(id)
     .then(user => {
         if(user) {
             res.status(200).json({success: true, user})
@@ -59,7 +60,7 @@ server.get('/users/:id', (req, res) => {
         } else {
             res.status(404).json({success: false, message: "The user with the specified ID does not exist."})
         }
-    }) .cach(err => {
+    }) .catch(err => {
         res.status(500).json({
             success: false,
             err
@@ -68,3 +69,42 @@ server.get('/users/:id', (req, res) => {
 });
 
 
+// Delete 
+
+server.delete('/users/:id', (req, res) => {
+    const {id} = req.params; // Destructure id 
+    users.remove(id)
+    .then(user => {
+        if(user) {
+            res.status(204).end();
+        } else {
+            res.status(404).json({
+                success: false,
+                message: "I cannot find the user you are looking for "
+            })
+        }
+    }) .catch(err => {
+        res.status(500).json({ success: false, err})
+    })
+});
+
+//UPDATE
+
+server.put('/users/:id', (req, res) => {
+    const {id} = req.params;
+    const changes = req.body
+
+    users.update( id, changes)
+    .then(updated => {
+        if(updated) {
+            res.status(200).json({success: true, updated})
+        } else {
+            res.status(404).json({
+                success: false,
+                message: "I cannot find the user you are looking for"
+            })
+        } 
+    })  .catch(err => {
+        res.status(500).json({ success: false, err})
+    })
+});
